@@ -1,0 +1,97 @@
+<% include partials/header_panel %>
+<% include partials/nav %>
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Dashboard
+      <small>for <%= shop %></small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+      
+    </ol>
+  </section>
+ 	<section class="content">  
+
+		  <div class="row">
+		  	<div class="col-md-6 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-green"><i class="fa  fa-users"></i></span>
+				  <div class="info-box-content">
+				    <span class="info-box-text">Subscribers</span>
+				    <span class="info-box-number"><%= subscribers %></span>
+				  </div><!-- /.info-box-content -->
+			  </div><!-- /.info-box -->
+			</div>
+			<div class="col-md-6 col-sm-6 col-xs-12">
+				<div class="info-box">
+					  <span class="info-box-icon bg-red"><i class="fa fa-eye"></i></span>
+					  <div class="info-box-content">
+					    <span class="info-box-text">Most Subscribed Product: <b><%= most_subscribed[0]._id %></b></span>
+					    <span class="info-box-number"><%= most_subscribed[0].subscribers %> Subscribers</span>
+					  </div><!-- /.info-box-content -->
+				</div><!-- /.info-box -->
+			</div>
+		</div>
+		<!-- <div class="row"> -->
+		<div class="box">
+		  <div class="box-header with-border">
+		    <h3 class="box-title">How to setup NOTIFIER ? </h3>
+		    <div class="box-tools pull-right">
+		      <!-- Buttons, labels, and many other things can be placed here! -->
+		      <!-- Here is a label for example -->
+		      <span class="label label-primary"></span>
+		    </div><!-- /.box-tools -->
+		  </div><!-- /.box-header -->
+		  <div class="box-body">
+		    You can use either the built in <a href="/html/install.html">installer</a>. <br><br>
+		    <b>OR</b><br><br>
+		    If you want faster loading install the script yourself , just copy the following code and add it to your template.<br>
+		    1. Go to the themes section of your Shopify Store.<br>
+		    2. Click on the <b>Customize theme</b> button.<br>
+		    3. Click on the <b>Theme Options</b> button(On top of the page) and click on the <b>Edit HTML/CSS</b> button.<br>
+		    4. Click on the <b>theme.liquid</b> file and add this code before the ending head tag : <b>&lt;/head&gt;</b><br><br>
+		    <pre>
+		    	&lt;script src="<%= script_url %>"&gt;&lt;/script&gt;
+		    	</pre>
+		    
+		    <br>
+		  </div><!-- /.box-body -->
+		  <div class="box-footer">
+		    <b>Script URL</b>: <%= script_url %>
+		  </div><!-- box-footer -->
+		</div><!-- /.box -->
+		<div class="box">
+		  <div class="box-header with-border">
+		    <h3 class="box-title">Subscriptions by Products </h3>
+		    <div class="box-tools pull-right">
+		      <!-- Buttons, labels, and many other things can be placed here! -->
+		      <!-- Here is a label for example -->
+		      <span class="label label-primary"></span>
+		    </div><!-- /.box-tools -->
+		  </div><!-- /.box-header -->
+		  <div class="box-body table-responsive no-padding">
+	          <table class="table table-hover">
+	            <tr>
+	              <th>Product</th>
+	              <th>Subscribers</th>
+	            </tr>
+
+   
+			<% for(var i=0; i<output.length; i++) {%>
+			   <tr><td><%= output[i].title %></td><td><%= output[i].subscribers %></td></tr>
+			<% } %>
+			</table>
+		  </div><!-- /.box-body -->
+		  <div class="box-footer">
+		    
+		  </div><!-- box-footer -->
+		</div><!-- /.box -->
+		<!-- </div> -->
+	</section>
+</div>
+
+	  
+
+<% include partials/footer_panel %>

@@ -1,0 +1,2 @@
+developmentstore-3.myshopify.com
+d831f0fe0501ae016a49f60460b8cc71{"access_token":"d831f0fe0501ae016a49f60460b8cc71"}

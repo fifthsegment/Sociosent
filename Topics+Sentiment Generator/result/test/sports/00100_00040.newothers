@@ -1,0 +1,21 @@
+model_dir=/home/ubuntu/JST-master/JST-master/result/train/sports/
+model_name=00100
+data_dir=/home/ubuntu/JST-master/JST-master/data/
+datasetFile=test.dat
+result_dir=/home/ubuntu/JST-master/JST-master/result/test/sports/
+niters-inf=60
+savestep-inf=20
+
+------------------ Testset ** test.dat ** statistics ----------------------
+newNumDocs=1365
+newCorpusSize=8765
+newVocabSize=1328
+numNewWords=0
+aveDocLength=6
+
+------------------ Loaded model settings ----------------------
+numSentiLabs=3
+numTopics=1
+numDocs=1365
+corpusSize=0
+vocabSize=1328

@@ -1,0 +1,20 @@
+data_dir=/home/ubuntu/JST-master/JST-master/data/
+datasetFile=train.dat
+result_dir=/home/ubuntu/JST-master/JST-master/result/train/sports/
+sentiLexFile=/home/ubuntu/JST-master/JST-master/data/mpqa.constraint
+
+-------------------- Corpus statistics -----------------------
+numDocs=1365
+corpusSize=8765
+aveDocLength=6
+vocabSize=1328
+
+---------------------- Model settings -----------------------
+numSentiLabs=3
+numTopics=1
+liter=600
+savestep=100
+updateParaStep=50
+_alpha=0.100000
+_beta=0.010000
+_gamma=0.100000

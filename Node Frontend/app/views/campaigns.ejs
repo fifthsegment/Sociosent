@@ -1,0 +1,103 @@
+<% include partials/header_panel %>
+<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
+var x = "http://52.6.108.198/scraper/";
+
+
+
+
+</script>
+
+
+<body class="skin-blue">
+<div class="wrapper">
+
+  <!-- Main Header -->
+  <header class="main-header">
+
+    <!-- Logo -->
+    <a href="#" class="logo" style="background-color: #4C5763;"><b>Admin</b>Panel</a>
+
+    <!-- Header Navbar -->
+    <nav class="navbar navbar-static-top" role="navigation" style="background-color:#2B2E31">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+      <!-- Navbar Right Menu -->
+
+    </nav>
+  </header>
+  <!-- Left side column. contains the logo and sidebar -->
+  <aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+      <ul class="sidebar-menu">
+        <li class="header"></li>
+        <li class="active"><a href="#"><a href="/"><span>Campagins</span></a></li>
+        <li><a href="#"><a href="/dash/step1"><span>Start new Campagin</span></a></li>
+        <li ><a href="#"><span>Analytics Dashboard</span></a></li>
+      </ul><!-- /.sidebar-menu -->
+    </section>
+    <!-- /.sidebar -->
+  </aside>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Dashboard
+        <small></small>
+      </h1>
+      <!-- ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
+        <li class="active">Here</li>
+      </ol> -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+    
+
+<div id ="mainDiv"></div>
+<div class="box">
+            <div class="box-header with-border">
+              <h3 class="box-title">Campaigns setup on this server</h3>
+              </div>
+              <div class="box-body">
+              	<table class="table">
+<thead>
+	<tr>
+		<th>Campaign</th>
+		<th colspan="2">Actions </th>
+	</tr>
+</thead>
+    <% for(var i=0; i<data.length; i++) { %>
+        <tr>
+            <td>
+                <%= data[i].campaign_id %>
+            </td>
+            <td><a class='btn btn-primary' href='/campaigns/<%= data[i].campaign_id %>'>
+                View Dashboard
+            </a></td>
+            
+            <% if (data[i].command.length==5) {%>
+            <td>
+            <a class='btn btn-danger' href='http://52.6.108.198/scraper/?stop=<%= data[i].campaign_id %>'>
+                Quit
+            </a></td>
+
+            <% } %>
+            <% if (data[i].command.length==4) {%>
+            <td> Not Running
+            </td>
+            <% } %>
+        </tr>
+    <% } %>
+</table>
+              </div>
+          </div>
+
+</section>
+</div>
+<% include partials/footer_panel %>

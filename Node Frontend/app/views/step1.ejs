@@ -1,0 +1,151 @@
+<% include partials/header_panel %>
+<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
+var x = "http://52.7.167.156/scraper/?step2&campaign=anewtest";
+
+$(document).ready(function(){
+	// $.ajax({
+	//   url: x,
+	//   context: document.body
+	// }).done(function() {
+	//   $( this ).addClass( "done" );
+	// });
+
+	$( "#mainForm" ).submit(function( event ) {
+	  // alert( "Handler for .submit() called." );
+	  // ?campaign_id=anewtest&keywords=love%0D%0Ahello+&step1=
+	  $.ajax({
+		  url: x,
+		  context: document.body,
+		  data : $('#mainForm').serialize(),
+		}).fail(function(data) {
+		  // $( this ).addClass( "done" );
+		  // alert("Error");
+		  
+		  // http://52.6.108.198/scraper/?step2&campaign=test1231
+		  var id = $("#campaign_id").val();
+		  var link = '<a href="http://52.7.167.156/scraper/?step2&campaign='+ id + '">Click here to Start</a>';
+		  var url = "http://52.7.167.156/scraper/?step2&campaign="+ id;
+		  $.ajax({
+			  url: url,
+			  context: document.body,
+			  
+			}).fail(function() {
+				// alert("Second call failed");
+			}).done(function (){
+				alert("Second call Done");
+			})
+		  $("#mainForm").html("");
+		  $("#title").html("Starting up");
+		  var text = "Booting up Tweet Collector....";
+
+			setTimeout(function(){
+				$("#mainDiv").append("<br>Running Campaign");
+				$("#title").html("Executing campaign...");
+				setTimeout(function(){
+					$("#mainDiv").append("<br>Done. Starting other services...Done. You may close this page now. <br>Click on the Campaigns section to view your campaign.");
+					var cmp_id = $("#campaign_id").val();
+
+
+					// $.ajax({
+					//   url: url4,
+					//   context: document.body,
+					  
+					// }).fail(function() {
+					// 	// alert("Second call failed");
+						
+					// }).done(function (){
+						
+					// })
+
+
+
+				}, 2000);
+
+			}, 2000);
+		  $("#mainDiv").append(text);
+		  // alert("Done Processing form" +data);
+		}).done(function() {
+		  // $( this ).addClass( "done" );
+		  // alert("Done");
+		});
+	  event.preventDefault();
+	});
+})
+
+
+</script>
+
+
+<body class="skin-blue">
+<div class="wrapper">
+
+  <!-- Main Header -->
+  <header class="main-header">
+
+    <!-- Logo -->
+    <a href="#" class="logo" style="background-color: #4C5763;"><b>Admin</b>Panel</a>
+
+    <!-- Header Navbar -->
+    <nav class="navbar navbar-static-top" role="navigation" style="background-color:#2B2E31">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+      <!-- Navbar Right Menu -->
+
+    </nav>
+  </header>
+  <!-- Left side column. contains the logo and sidebar -->
+  <aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+      <ul class="sidebar-menu">
+        <li class="header"></li>
+        <li><a href="#"><a href="/"><span>Campagins</span></a></li>
+        <li class="active"><a href="#"><a href="/dash/step1"><span>Start new Campaign</span></a></li>
+        
+      </ul><!-- /.sidebar-menu -->
+    </section>
+    <!-- /.sidebar -->
+  </aside>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Dashboard
+        <small></small>
+      </h1>
+      <!-- ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
+        <li class="active">Here</li>
+      </ol> -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+    
+<h3 id="title">
+	Start a New campaign
+</h3>
+<form id="mainForm" action="http://52.7.167.156/scraper/" method="GET" >
+	Campaign Name :<br><em>IMPORTANT: Make sure that there are no spaces in the campaign name</em><br>
+	<input type="text" name="campaign_id" id ="campaign_id">
+<br>
+	Keywords:<br>
+	<em>IMPORTANT: Use new lines to separate keywords. You can enter upto 400 keywords</em><br>
+	<pre>
+	Example list: 
+
+	Pakistan
+	Cricket
+	PakvsIndia</pre>
+	<textarea name="keywords" rows="14" cols="50"> </textarea><br>
+	<input type="hidden" name="step1">
+<input type="submit" class="btn btn-primary" value="submit">
+</form>
+<div id ="mainDiv"></div>
+</section>
+</div>
+<% include partials/footer_panel %>

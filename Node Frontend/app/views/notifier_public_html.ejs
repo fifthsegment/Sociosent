@@ -1,0 +1,86 @@
+<!-- <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" /> -->
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Lato:700" />
+<style>
+  h1, h3, p{
+    font-family: 'Lato', sans-serif;
+  }
+  body{
+    /*background-color: #6aa;*/
+  }
+  #setupnotifications {
+  background: #5c5c5c;
+  color: white;
+  text-shadow: 0px 2px 0px rgba(0, 0, 0, 0.3);
+  font-size: 22px;
+  height: 58px;
+  width: 335px;
+  margin: 50px 0 0 50px;
+  overflow: hidden;
+  display: block;
+  text-align: center;
+  line-height: 58px;
+  
+  /*Rounded Corners*/
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  
+  /*Shadow*/
+  -webkit-box-shadow: 0px 6px 0px rgba(0, 0, 0, 0.8);
+  -moz-box-shadow: 0px 6px 0px rgba(0, 0, 0, 0.8);
+  box-shadow: 0px 6px 0px rgba(0, 0, 0, 0.8);
+  
+  /*Gradient*/
+  background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+  background-image: -moz-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+  background-image: -o-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+  background-image: -ms-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+  background-image: linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+  text-decoration:none;
+}
+
+#setupnotifications:hover {
+  margin-top: 52px;
+  
+  /*Shadow*/
+  -webkit-box-shadow: 0px 4px 0px rgba(0, 0, 0, 0.8);
+  -moz-box-shadow: 0px 4px 0px rgba(0, 0, 0, 0.8);
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 0.8);
+  
+  /*Gradient*/
+  background-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4));
+  background-image: -moz-linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4));
+  background-image: -o-linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4));
+  background-image: -ms-linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4));
+  background-image: linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4));
+  text-decoration:none;
+}
+</style>
+
+<!-- <body>
+<div class="container">
+<br>
+<div class="panel panel-default" ng-show="stepcontentdisplayer" class="ng-hide">
+  <div class="panel-heading">
+    <h3 class="panel-title">NOTIFIER. Setup : Step <b>1</b> of 2</h3>
+  </div>
+  <div class="panel-body"> -->
+
+    <center style="background-color:white; background-image: url('clients/bg.png');">
+
+      <br>
+      <h1>&nbsp;&nbsp;<%= store_name %></h1>
+      <p>
+      <h3><a href='<%= pushbulletconnector %>' id="setupnotifications" target="_blank" class="">Setup Notifications (its Free!)</a></h3>
+      </p>
+      <!-- <hr> -->
+      <p style="color:slategray;">Subscribe to our channel here (For <b>Product Updates</b>): 
+      <a class="pushbullet-subscribe-widget" data-channel="<%= channel %>" data-widget="button" data-size="small"></a>
+      <script type="text/javascript">(function(){var a=document.createElement('script');a.type='text/javascript';a.async=true;a.src='https://widget.pushbullet.com/embed.js';var b=document.getElementsByTagName('script')[0];b.parentNode.insertBefore(a,b);})();</script>
+
+      </p>
+    </center>
+<!--   </div>
+</div>
+<div>
+</body> -->
