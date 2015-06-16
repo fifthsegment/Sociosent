@@ -1,0 +1,740 @@
+
+
+
+<% include partials/header_panel %>
+
+<style>
+.bubble circle{
+  background-color:white;
+}
+</style>
+
+<script>
+
+
+function executeServices(){
+  var cmp_id = "<%= campaign_id %>";
+  var url1 = 'http://52.1.246.239/api/geoCode?server=52.6.108.198&user=root&password=letmein1213&db=newscraper_db&portno=3306&offset=0&count=10&cmp_id='+cmp_id;
+          $.ajax({
+            url: url1,
+            context: document.body,
+            
+          }).fail(function() {
+            // alert("Second call failed");
+            console.log("LOGGER : CALL1 FAIL");
+
+          }).done(function (){
+            // alert("Second call Done");
+            console.log("LOGGER : CALL1 SUCCESS");
+          })
+          var url2 = 'http://54.88.170.216/api/spamFilter?server=52.6.108.198&user=root&password=letmein1213&db=newscraper_db&portno=3306&offset=10&count=50&cmp_id='+cmp_id
+
+          var url3 = 'http://54.88.170.216/api/cleanup?server=52.6.108.198&user=root&password=letmein1213&db=newscraper_db&portno=3306&offset=10&count=50&cmp_id='+cmp_id
+
+          var url4 = 'http://52.0.14.195:8080/api/trainSentiment?server=52.6.108.198&user=root&password=letmein1213&db=newscraper_db&portno=3306&offset=10&count=50&cmp_id='+cmp_id
+
+          $.ajax({
+            url: url2,
+            context: document.body,
+            
+          }).fail(function() {
+            // alert("Second call failed");
+            console.log("LOGGER : CALL2 FAIL");
+          }).done(function (){
+            // alert("Second call Done");
+            console.log("LOGGER : CALL2 SUCCESS");
+          })
+
+
+          $.ajax({
+            url: url3,
+            context: document.body,
+            
+          }).fail(function() {
+            // alert("Second call failed");
+            console.log("LOGGER : CALL3 FAIL");
+          }).done(function (){
+            console.log("LOGGER : CALL3 SUCCESS");
+          })
+          $.ajax({
+            url: url4,
+            context: document.body,
+            
+          }).fail(function() {
+            // alert("Second call failed");
+            console.log("LOGGER : CALL4 FAIL");
+            
+          }).done(function (){
+              console.log("LOGGER : CALL4 SUCCESS");
+          })
+}
+
+function makeBubble (id, data, type){
+  var width = document.getElementById(id).offsetWidth
+  var diameter = width,
+      format = d3.format(",d"),
+      color = d3.scale.category20c();
+
+  var bubble = d3.layout.pack()
+      .sort(null)
+      .size([diameter, diameter])
+      .padding(1.5);
+
+  var svg = d3.select('#'+id).append("svg")
+      .attr("width", diameter)
+      .attr("height", diameter)
+      .attr("class", "bubble");
+      var currentColor = "blue";
+      if (type=="positive"){
+        var root = data.sentiment.positive;
+        currentColor = "#00a65a"
+        currentStrokeColor = "#00743F"
+      }
+          
+      if (type=="negative"){
+        var root = data.sentiment.negative;
+        currentColor="#dd4b39"
+        currentStrokeColor = "#6E261C"
+      }
+
+      if (type=="neutral"){
+        var root = data.sentiment.neutral;
+        currentColor="#F39C12"
+        currentStrokeColor = "#DB8C10"
+      }
+         
+
+
+      // root = JSON.parse( myjson ); //add this line
+
+// d3.json("/path/flare.json", function(json) { #delete this line
+
+    // json = JSON.parse( myjson ); //add this line
+
+    console.log("Rendering Chart");
+
+  // d3.json(root, function(error, root) 
+  // {
+
+    var node = svg.selectAll(".node")
+        .data(bubble.nodes(classes(root))
+        .filter(function(d) { return !d.children; }))
+      .enter().append("g")
+        .attr("class", "node")
+        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+    node.append("title")
+        .text(function(d) { return d.className + ": " + format(d.value); });
+
+    node.append("circle")
+        .attr("r", function(d) { return d.r; })
+        .attr("stroke-width", '2')
+        .attr("stroke", currentStrokeColor)
+        .style("fill", function(d) { return currentColor; });
+
+
+    node.append("text")
+        .attr("dy", "1.1em")
+        .style("text-anchor", "middle")
+        .style("fill", "white")
+        .style("font-size", "22px")
+        .text(function(d) { return d.className.substring(0, d.r / 3); });
+  // });
+
+  // Returns a flattened hierarchy containing all leaf nodes under the root.
+  function classes(root) {
+    var classes = [];
+
+    function recurse(name, node) {
+      if (node.children) node.children.forEach(function(child) { recurse(node.name, child); });
+      else classes.push({packageName: name, className: node.name, value: node.size});
+    }
+
+    recurse(null, root);
+    return {children: classes};
+  }
+
+  d3.select(self.frameElement).style("height", diameter + "px");
+}
+
+
+
+function updateLocationMaps(data){
+        var visitorsData = data.countries;
+        // console.log(data.countries);
+        var max = 0; var sum = 0; var maxcountry = "";
+        for (var prop in data.countries) {
+           if (data.countries[prop]>max){
+              max = data.countries[prop];
+              console.log("Currently on Country "+prop);
+              maxcountry = prop;
+           }
+           sum = sum + data.countries[prop];
+        }
+        var highest = (max/sum)*100
+        highest = Math.round(highest * 100) / 100
+        var prep = "<strong>"+highest+"%</strong><br>"+maxcountry;
+        $("#locFirst").html(prep);
+
+
+        var smax = 0;  var smaxcountry = "";
+        for (var prop in data.countries) {
+           if (data.countries[prop]>smax && data.countries[prop]<max){
+              smax = data.countries[prop];
+              console.log("Currently on Country "+prop);
+              smaxcountry = prop;
+           }
+           // sum = sum + data.countries[prop];
+        }
+        var shighest = (smax/sum)*100
+        shighest = Math.round(shighest * 100) / 100
+        var prep = "<strong>"+shighest+"%</strong><br>"+smaxcountry;
+        $("#locSecond").html(prep);
+
+        var tmax = 0;  var tmaxcountry = "";
+        for (var prop in data.countries) {
+           if (data.countries[prop]>tmax && data.countries[prop]<smax){
+              tmax = data.countries[prop];
+              console.log("Currently on Country "+prop);
+              tmaxcountry = prop;
+           }
+           // sum = sum + data.countries[prop];
+        }
+        var thighest = (tmax/sum)*100
+        thighest = Math.round(thighest * 100) / 100
+        var prep = "<strong>"+thighest+"%</strong><br>"+tmaxcountry;
+        $("#locThird").html(prep);
+        // var visitorsData = {
+        //   "US": 398, //USA
+        //   "SA": 400, //Saudi Arabia
+        //   "CA": 2000, //Canada
+        //   "DE": 5000, //Germany
+        //   "FR": 760, //France
+        //   "CN": 300, //China
+        //   "AU": 700, //Australia
+        //   "BR": 600, //Brazil
+        //   "IN": 800, //India
+        //   "GB": 85, //Great Britain
+        //   "RU": 3000 //Russia
+        // };
+      $('#world-map').vectorMap({
+        map: 'world_mill_en',
+        backgroundColor: "transparent",
+        regionStyle: {
+          initial: {
+            fill: '#e4e4e4',
+            "fill-opacity": 1,
+            stroke: 'none',
+            "stroke-width": 0,
+            "stroke-opacity": 1
+          }
+        },
+        series: {
+          regions: [{
+              values: visitorsData,
+              scale: ["#92c1dc", "#ebf4f9"],
+              normalizeFunction: 'polynomial'
+            }]
+        },
+        onRegionLabelShow: function (e, el, code) {
+          if (typeof visitorsData[code] != "undefined")
+            el.html(el.html() + ': ' + visitorsData[code] + ' new visitors');
+        }
+      });
+}
+
+function updatePage(data){
+  console.log("Updating Page");
+  $("#conversations").html(data.conversations);
+  $("#mentions").html(data.mentions);
+  $("#tweets").html(data.tweets);
+  $("#audience").html(data.audience);
+}
+
+function updateOverallSentiment(data2){
+  console.log(data2.overallsentiment.positive);
+  console.log(data2.overallsentiment.positive);
+   var donutData = [
+          {label: "Positive", data: data2.overallsentiment.positive, color: "#3c8dbc"},
+          {label: "Negative", data: data2.overallsentiment.negative, color: "#0073b7"},
+          {label: "Neutral", data: data2.overallsentiment.neutral, color: "#00c0ef"}
+        ];
+        $.plot("#donut-chart", donutData, {
+          series: {
+            pie: {
+              show: true,
+              radius: 1,
+              innerRadius: 0.5,
+              label: {
+                show: true,
+                radius: 2 / 3,
+                formatter: labelFormatter,
+                threshold: 0.1
+              }
+
+            }
+          },
+          legend: {
+            show: false
+          }
+        });
+}
+
+
+function updateVolume(data){
+  var salesChartCanvas = $("#salesChart").get(0).getContext("2d");
+  var salesChart = new Chart(salesChartCanvas);
+
+  var salesChartData = {
+    labels: data.volumes.label,
+    datasets: [
+      {
+        label: "Digital Goods",
+        fillColor: "rgba(60,141,188,0.9)",
+        strokeColor: "rgba(60,141,188,0.8)",
+        pointColor: "#3b8bba",
+        pointStrokeColor: "rgba(60,141,188,1)",
+        pointHighlightFill: "#fff",
+        pointHighlightStroke: "rgba(60,141,188,1)",
+        data: data.volumes.data
+      }
+    ]
+  };
+
+  var salesChartOptions = {
+    //Boolean - If we should show the scale at all
+    showScale: true,
+    //Boolean - Whether grid lines are shown across the chart
+    scaleShowGridLines: false,
+    //String - Colour of the grid lines
+    scaleGridLineColor: "rgba(0,0,0,.05)",
+    //Number - Width of the grid lines
+    scaleGridLineWidth: 1,
+    //Boolean - Whether to show horizontal lines (except X axis)
+    scaleShowHorizontalLines: true,
+    //Boolean - Whether to show vertical lines (except Y axis)
+    scaleShowVerticalLines: true,
+    //Boolean - Whether the line is curved between points
+    bezierCurve: true,
+    //Number - Tension of the bezier curve between points
+    bezierCurveTension: 0.3,
+    //Boolean - Whether to show a dot for each point
+    pointDot: false,
+    //Number - Radius of each point dot in pixels
+    pointDotRadius: 4,
+    //Number - Pixel width of point dot stroke
+    pointDotStrokeWidth: 1,
+    //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+    pointHitDetectionRadius: 20,
+    //Boolean - Whether to show a stroke for datasets
+    datasetStroke: true,
+    //Number - Pixel width of dataset stroke
+    datasetStrokeWidth: 2,
+    //Boolean - Whether to fill the dataset with a color
+    datasetFill: true,
+    //String - A legend template
+
+    //Boolean - whether to maintain the starting aspect ratio or not when responsive, if set to false, will take up entire container
+    maintainAspectRatio: false,
+    //Boolean - whether to make the chart responsive to window resizing
+    responsive: true
+  };
+
+  //Create the line chart
+  salesChart.Line(salesChartData, salesChartOptions);
+}
+
+function updateDonuts(data){
+       var hashtags = [
+        "#germany",
+        "france",
+        "#gameinsight",
+        "#tff2015",
+        "#vamsterdam"
+      ]
+      for (var i = 0; i < 5; i ++){
+        console.log("Creating donut");
+        var donut = new Morris.Donut({
+          element: 'sales-chart'+i,
+          resize: true,
+          colors: ["#DD4B39 ", "#F39C12", "#00A65A"],
+          data: [
+            {label: hashtags[i], value: 12},
+            {label: hashtags[i], value: 30},
+            {label: hashtags[i], value: 20}
+          ],
+          hideHover: 'auto'
+
+        });
+      }
+}
+
+
+function labelFormatter(label, series) {
+        return "<div style='font-size:13px; text-align:center; padding:2px; color: #fff; font-weight: 600;'>"
+                + label
+                + "<br/>"
+                + Math.round(series.percent) + "%</div>";
+      }
+
+
+function locationSentimentUpdate(id, data){
+      console.log("Location Sentiment updating");
+        var tdat = data.totalLocationSentiment;
+        var table = "";
+        var $rows = $("<tbody>");
+        for (var i = tdat.length - 1; i >= 0; i--) {
+          console.log(i);
+          var item = tdat[i];
+          // table = table + "<tr></td>"+row.country+"</td></td>"+row.sentiment+"</td></td>"+row.count+"</td></tr>";
+          var $tr = $('<tr class="">').append(
+              $('<td>').text(item.country),
+              $('<td>').text(item.sentiment),
+              $('<td>').text(item.count*33)
+          ); //.appendTo('#records_table');
+          console.log($tr.wrap().html());
+          $rows.append($tr);
+
+
+        };
+        console.log(table);
+        console.log('#'+id);
+        $('#'+id).html($rows.wrap('<table class="table">').html());
+  }
+
+$(function () {
+
+  $("#actualcontent").hide();
+  $("#loading").show();
+
+  var campaign_id = "<%= campaign_id %>";
+
+  $.getJSON( "/api/"+campaign_id, function( data ) {
+    // $("#loading").hide();
+      console.log("Load performed"+data);
+      $("#loading").hide();
+      $("#actualcontent").show();
+      updatePage(data);
+      // updateDonuts(data);
+      updateLocationMaps(data);
+      updateVolume(data);
+      updateOverallSentiment(data);
+      var url = "/api/-1/sentiment";
+        // var url = "flare.json";
+      makeBubble('topic-bubble',data, 'positive');
+      makeBubble('topic-bubble2',data, 'negative');
+      makeBubble('topic-bubble3',data, 'neutral');
+      locationSentimentUpdate('locationSentiment', data);
+      console.log("Called makeBubble");
+// makeBubble('topic-bubble2', url)
+  });
+
+  $('#reloadVolume').on('click', function (e) {
+    console.log("Reloading Volume");
+    $("#loading").show();
+    $.getJSON( "/api/"+campaign_id, function( data ) {
+    // $("#loading").hide();
+      console.log("Load performed"+data);
+      $("#loading").hide();
+      $("#actualcontent").show();
+      updatePage(data);
+      // updateDonuts(data);
+      // updateLocationMaps(data);
+      updateVolume(data);
+    });
+
+    
+
+     //your awesome code here
+
+})
+
+  $('#executeServices').on('click', function (e) {
+      console.log("Executing");
+      executeServices();
+
+      // e.preventDefault();
+    });
+
+});
+
+
+
+// function reload(what){
+//   if (what=="volume"){
+    
+
+//   }
+// }
+// var app = angular.module('root', []);
+//   app.controller("index",function ($scope, $http) {
+//   $scope.pageData = {};
+//   $scope.loading= true;
+//   var responsePromise = $http.get("/api/-1");
+//   responsePromise.success(function(data, status, headers, config) {
+//       $scope.pageData = data;
+//       $scope.loading=false;
+
+
+
+//       // $scope.schema = data.schema;
+//       // $scope.model = data.model;
+//       // $scope.message = "";
+//       // $scope.loader = false;
+//   });
+// });
+
+</script>
+
+
+<body class="skin-blue">
+<div class="wrapper">
+
+  <!-- Main Header -->
+  <header class="main-header">
+
+    <!-- Logo -->
+    <a href="#" class="logo" style="background-color: #4C5763;"><b>Admin</b>Panel</a>
+
+    <!-- Header Navbar -->
+    <nav class="navbar navbar-static-top" role="navigation" style="background-color:#2B2E31">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+      <!-- Navbar Right Menu -->
+
+    </nav>
+  </header>
+  <!-- Left side column. contains the logo and sidebar -->
+  <aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+      <ul class="sidebar-menu">
+        <li class="header"></li>
+        <li><a href="#"><a href="/dash/campaigns"><span>Campagins</span></a></li>
+        <li><a href="#"><a href="/dash/step1"><span>Start New Campagin</span></a></li>
+        <li class="active"><a href="/"><span>Analytics Dashboard</span></a></li>
+        <li class=""><a href="#" ><span id="executeServices">Refresh Data</span></a></li>
+      </ul><!-- /.sidebar-menu -->
+    </section>
+    <!-- /.sidebar -->
+  </aside>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Dashboard
+        <small></small>
+      </h1>
+      <!-- ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
+        <li class="active">Here</li>
+      </ol> -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+    <div id="loading">
+      <center><h2>Loading</h2></center>
+    </div>
+
+    <!-- Info boxes -->
+    <div id="actualcontent">
+      <div class="row">
+        
+        <div class="col-md-6 ">
+          <div class="info-box">
+            <span class="info-box-icon bg-red"><i class="fa fa-star"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">Random Sample</span>
+              <span class="info-box-number" id="mentions"></span>
+            </div><!-- /.info-box-content -->
+          </div><!-- /.info-box -->
+        </div><!-- /.col -->
+
+        <!-- fix for small devices only -->
+
+        <div class="col-md-3 ">
+          <div class="info-box">
+            <span class="info-box-icon bg-green"><i class="fa fa-twitter-square"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">Tweets</span>
+              <span class="info-box-number" id="tweets"></span>
+            </div><!-- /.info-box-content -->
+          </div><!-- /.info-box -->
+        </div><!-- /.col -->
+        <div class="col-md-3 ">
+          <div class="info-box">
+            <span class="info-box-icon bg-yellow"><i class="ion ion-ios-people-outline"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">Audience</span>
+              <span class="info-box-number" id="audience"></span>
+            </div><!-- /.info-box-content -->
+          </div><!-- /.info-box -->
+        </div><!-- /.col -->
+      </div><!-- /.row -->
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="box">
+            <div class="box-header with-border">
+              <h3 class="box-title">Activity Volume Report</h3>
+              <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                <div class="btn-group">
+                  <button class="btn"  id="reloadVolume"><i class="fa fa-refresh" ></i></button>
+                  <ul class="dropdown-menu" role="menu">
+                    <!-- <li><a href="#">Action</a></li> -->
+                    <!-- <li><a href="#">Another action</a></li> -->
+                    <!-- <li><a href="#">Something else here</a></li> -->
+                    <li class="divider"></li>
+                    <!-- <li><a href="#">Separated link</a></li> -->
+                  </ul>
+                </div>
+                <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div><!-- /.box-header -->
+            <div class="box-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <p class="text-center">
+                    <strong>Tweet Volumes</strong>
+                  </p>
+                  <div class="chart-responsive">
+                    <!-- Sales Chart Canvas -->
+                    <canvas id="salesChart" height="180"></canvas>
+                  </div><!-- /.chart-responsive -->
+                </div><!-- /.col -->
+
+              </div><!-- /.row -->
+            </div><!-- ./box-body -->
+            <div class="box-footer">
+
+            </div><!-- /.box-footer -->
+          </div><!-- /.box -->
+        </div><!-- /.col -->
+        
+        <div class="col-md-6">
+        
+          <!-- Map box -->
+          <div class="box box-solid bg-light-blue-gradient">
+            <div class="box-header">
+              <!-- tools box -->
+              
+
+              <i class="fa fa-map-marker"></i>
+              <h3 class="box-title">
+                Tweet Origins
+              </h3>
+            </div>
+            <div class="box-body">
+             <div id="world-map" style="height: 250px; width: 100%;">
+               
+             </div>
+             </div>
+             <div class="box-footer no-border">
+              <div class="row">
+                <div class="col-xs-4 text-center" style="border-right: 1px solid #f4f4f4">
+                  <!-- <div id="sparkline-1"></div> -->
+                  <div class="knob-label" id ="locFirst"></div>
+                </div><!-- ./col -->
+                <div class="col-xs-4 text-center" style="border-right: 1px solid #f4f4f4">
+                  <!-- <div id="sparkline-2"></div> -->
+                  <div class="knob-label" id= "locSecond"><strong>34%</strong><br>Great Britain</div>
+                </div><!-- ./col -->
+                <div class="col-xs-4 text-center">
+                  <!-- <div id="sparkline-3"></div> -->
+                  <div class="knob-label" id="locThird"><strong>20%</strong><br>Others</div>
+                </div><!-- ./col -->
+              </div><!-- /.row -->
+            </div>
+          
+        </div>
+        </div>
+      </div><!-- /.row -->
+
+
+      <div class="row">
+        <div class="col-md-6">
+            <div class="box box-solid ">
+              <div class="box-header with-border">
+                <h3 class="box-title" style="color:black;"><i class="fa fa-th"></i>&nbsp; Neutral Sentiment Topic Bubble</h3>
+                </div><!-- /.box-header -->
+                <div class="box-body">
+                  <div id="topic-bubble3" style=""></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+           <div class="box box-primary">
+              <div class="box-header">
+                <i class="fa fa-bar-chart-o"></i>
+                <h3 class="box-title">Overall Sentiment</h3>
+              </div>
+              <div class="box-body">
+                <div id="donut-chart" style="height:300px;"></div>
+              </div><!-- /.box-body-->
+            </div><!-- /.box -->
+            
+        </div>
+      </div>
+      <div class="row"> 
+    <div class="col-md-6">
+           <div class="box box-primary">
+              <div class="box-header">
+                <i class="fa fa-bar-chart-o"></i>
+                <h3 class="box-title">Positive Sentiment Topic Bubble</h3>
+              </div>
+              <div class="box-body">
+                <div id="topic-bubble" style=""></div>
+              </div><!-- /.box-body-->
+            </div><!-- /.box -->
+            
+        </div>
+    <div class="col-md-6">
+           <div class="box box-primary">
+              <div class="box-header">
+                <i class="fa fa-bar-chart-o"></i>
+                <h3 class="box-title">Negative Sentiment Topic Bubble</h3>
+              </div>
+              <div class="box-body">
+                <div id="topic-bubble2" style=""></div>
+              </div><!-- /.box-body-->
+            </div><!-- /.box -->
+            
+        </div>
+        </div>
+        <div class="row"> 
+          <div class="col-md-6">
+                     <div class="box box-primary">
+                        <div class="box-header">
+                          <i class="fa fa-bar-chart-o"></i>
+                          <h3 class="box-title">Location Based sentiment</h3>
+                        </div>
+                        <div class="box-body">
+                          <div id="locationSentiment" style=""></div>
+                        </div><!-- /.box-body-->
+                      </div><!-- /.box -->
+                      
+                  </div>
+        </div>  
+    </div>
+
+    
+    
+    </section>
+
+</div>
+
+
+<% include partials/footer_panel %>
+
+
+
+
+
+
+
+

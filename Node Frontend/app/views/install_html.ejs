@@ -1,0 +1,258 @@
+  <% include partials/header_panel %>
+<!-- <script type="text/javascript" src="/bower_components/angular-dynforms/dynamic-forms.js"></script> -->
+<!-- <script type="text/javascript" src="bower_components/angular/angular.min.js"></script> -->
+<script type="text/javascript" src="/bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+<script type="text/javascript" src="/bower_components/tv4/tv4.js"></script>
+<script type="text/javascript" src="/bower_components/objectpath/lib/ObjectPath.js"></script>
+<script type="text/javascript" src="/bower_components/angular-schema-form/dist/schema-form.js"></script>
+<script type="text/javascript" src="/bower_components/angular-schema-form/dist/bootstrap-decorator.min.js"></script>
+
+<script>
+
+function popitup(url) {
+  newwindow=window.open(url,'name','height=600,width=600');
+  if (window.focus) {newwindow.focus()}
+  return false;
+}
+
+
+var app = angular.module('root', ['schemaForm']);
+app.controller("index",function ($scope, $http) {
+$scope.message = "";
+
+$scope.loader = true;
+
+$scope.success = false;
+
+$scope.error = false;
+
+$scope.formData = {}; 
+
+
+$scope.schema = {};
+
+
+$scope.form = ["*"];
+
+$scope.model = {};
+
+var responsePromise = $http.get("/api/install");
+responsePromise.success(function(data, status, headers, config) {
+    $scope.schema = data.schema;
+    $scope.model = data.model;
+    $scope.form = data.form;
+    $scope.message = "";
+    $scope.loader = false;
+});
+responsePromise.error(function(data, status, headers, config) {
+    alert("AJAX failed!");
+});
+
+
+$scope.textValue="";
+
+$scope.submitThis = function(){
+  // alert($scope.textValue);
+  $http.post('/api/install', {data:'step2', type:'submit', channel : $scope.textValue }).
+      success(function(data, status, headers, config) {
+        // this callback will be called asynchronously
+        // when the response is available
+        // alert('Yeaaah!'+data);
+        $scope.step2contentdisplayer = true;
+        $scope.stepcontent = "Nothing"
+        $scope.loader = false;
+        $scope.message = "Success: Channel Saved succesfully. ";
+        $scope.success = true;
+        $scope.error = false;
+      }).
+      error(function(data, status, headers, config) {
+        // called asynchronously if an error occurs
+        // or server returns response with an error status.
+        $scope.success = false;
+        $scope.loader = false;
+        $scope.message = "Error: Unable to load data. ";
+        $scope.error = true;
+      });
+}
+
+
+$scope.install = function(step) {
+    console.log("Installer started");
+    console.log(step);
+    $scope.message = step+" started...";
+    $scope.success = false;
+    $scope.error = false;
+    if (step=='step1'){
+      $scope.stepcontent = "Something here";
+      $scope.step2contentdisplayer = false;
+      $http.post('/api/install', {data:step}).
+      success(function(data, status, headers, config) {
+        // this callback will be called asynchronously
+        // when the response is available
+        // alert('Yeaaah!'+data);
+        $scope.stepcontentdisplayer = true;
+        $scope.stepcontent = data.link
+        $scope.loader = false;
+        // $scope.message = "Success: Form Saved succesfully. ";
+        // $scope.success = true;
+      }).
+      error(function(data, status, headers, config) {
+        // called asynchronously if an error occurs
+        // or server returns response with an error status.
+        $scope.loader = false;
+        $scope.message = "Error: Unable to load data. ";
+        $scope.error = true;
+      });
+    }
+    if (step=='step2'){
+      $scope.stepcontentdisplayer = false;
+      $scope.stepcontent = "Something here";
+      $http.post('/api/install', {data:step, type:'get'}).
+      success(function(data, status, headers, config) {
+        // this callback will be called asynchronously
+        // when the response is available
+        // alert('Yeaaah!'+data);
+        $scope.step2contentdisplayer = true;
+        $scope.stepcontent = data.link
+        $scope.loader = false;
+        // $scope.message = "Success: Form Saved succesfully. ";
+        // $scope.success = true;
+      }).
+      error(function(data, status, headers, config) {
+        // called asynchronously if an error occurs
+        // or server returns response with an error status.
+        $scope.loader = false;
+        $scope.message = "Error: Unable to load data. ";
+        $scope.error = true;
+      });
+    }
+    if (step=='step3'){
+      $scope.message = "Running install...";
+      $scope.success = false;
+      $scope.stepcontentdisplayer = false;
+      $scope.step2contentdisplayer = false;
+      $http.post('/api/install', {data:step}).
+      success(function(data, status, headers, config) {
+        // this callback will be called asynchronously
+        // when the response is available
+        // alert('Yeaaah!'+data);
+        $scope.loader = false;
+        $scope.message = "Success: Notifier installed succesfully. ";
+        $scope.success = true;
+      }).
+      error(function(data, status, headers, config) {
+        // called asynchronously if an error occurs
+        // or server returns response with an error status.
+        $scope.loader = false;
+        $scope.message = "Error: Unable to install the Notifier App to your Store. ";
+        $scope.error = true;
+      });
+    }
+    
+
+},
+
+
+$scope.onSubmit = function(form) {
+    // console.log(form);
+    // alert($scope.model.webhook_identifier)
+    $scope.message = "Saving...";
+    $scope.loader = true;
+    $scope.success = false;
+    $scope.error = false;
+    $http.post('/api/install', {data:$scope.model}).
+      success(function(data, status, headers, config) {
+        // this callback will be called asynchronously
+        // when the response is available
+        // alert('Yeaaah!'+data);
+        $scope.loader = false;
+        $scope.message = "Success: Form Saved succesfully. ";
+        $scope.success = true;
+      }).
+      error(function(data, status, headers, config) {
+        // called asynchronously if an error occurs
+        // or server returns response with an error status.
+        $scope.loader = false;
+        $scope.message = "Error: Unable to save the form. ";
+        $scope.error = true;
+      });
+    
+}
+
+
+});
+
+  </script>
+<% include partials/nav %>
+<br>
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Dashboard
+      <small>for <%= shop %></small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Install</li>
+    </ol>
+  </section>
+  <!-- Main content -->
+  <section class="content">
+    <div class="" ng-controller="index">
+    <div class="" ng-app="root">
+
+    <!-- <div class="col-md-7" ng-controller="index"> -->
+      <!-- <p ng-controller="index"> -->
+    <div ng-controller="index">
+
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Install to Shopify</h3>
+        <div class="box-tools pull-right">
+          <!-- Buttons, labels, and many other things can be placed here! -->
+          <!-- Here is a label for example -->
+          <span class="label label-primary">Install</span>
+        </div><!-- /.box-tools -->
+      </div><!-- /.box-header -->
+      <div class="box-body">
+        <center><form sf-schema="schema" sf-form="form" sf-model="model" ng-submit="onSubmit(myForm)"></form></center>
+           <center><img ng-show="loader" class="ng-hide" src='/images/ajax-loader.gif'/></center>
+    <br ng-show="step2contentdisplayer">
+    <div class="panel panel-default" ng-show="step2contentdisplayer" class="ng-hide">
+      <div class="panel-body">
+        Channel name : <input id="textEdit" type="text" ng-model="textValue" />
+        <a href="#" class="btn btn-primary" ng-click="submitThis()">Submit</a>
+        <hr>
+        <center><b>If you haven't created a <a href="https://www.pushbullet.com/">Pushbullet</a> channel, <a href="https://www.pushbullet.com/my-channels">click here</a> to create one.</a></b></center>
+        </div>
+    </div>
+    <br ng-show="stepcontentdisplayer">
+    <div class="panel panel-default" ng-show="stepcontentdisplayer" class="ng-hide">
+      <div class="panel-body">
+      <center><a href='{{stepcontent}}'  target="_blank" >Click here to connect your PushBullet account with us</a></center>
+      </div>
+    </div>
+    <br>
+    <div class="alert alert-success" ng-show="success" class="ng-hide" role="alert">{{message}}</div>
+    <div class="alert alert-danger" ng-show="error" class="ng-hide" role="alert">{{message}}</div>
+      </div><!-- /.box-body -->
+      <div class="box-footer">
+        Shopify Installer
+      </div><!-- box-footer -->
+      <div class="overlay" ng-show="loader" class="ng-hide">
+        <i  class="fa fa-refresh fa-spin"></i>
+      </div>
+    </div><!-- /.box -->
+    
+    <!-- <form sf-schema="schema" sf-form="form" sf-model="model"></form> -->
+
+ 
+      </div>
+    </div>
+    </div>
+  </section>
+</div>
+
+
+  <% include partials/footer_panel %>

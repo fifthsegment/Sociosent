@@ -1,0 +1,166 @@
+// Load jQuery library using plain JavaScript
+(function(){
+  var newscript = document.createElement('script');
+     newscript.type = 'text/javascript';
+     newscript.async = true;
+     newscript.src = 'https://code.jquery.com/jquery-1.11.2.min.js';
+  (document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(newscript);
+  var newscript2 = document.createElement('script');
+     newscript2.type = 'text/javascript';
+     newscript2.async = true;
+     newscript2.src = '/clients/jquery.colorbox.js';
+  (document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(newscript2);
+    var style = document.createElement('style')
+    style.type = 'text/css'
+    style.innerHTML = '#colorbox{border: 5px solid #009966, overflow:hidden;} #button1-notifier{  display: block; -webkit-transition: All 0.5s ease;   -moz-transition: All 0.5s ease;   -o-transition: All 0.5s ease;   -ms-transition: All 0.5s ease;   transition: All 0.5s ease;}#button1-notifer:hover{width: 200px;}'
+    document.getElementsByTagName('head')[0].appendChild(style);
+})();
+
+var QueryString = function () {
+  // This function is anonymous, is executed immediately and 
+  // the return value is assigned to QueryString!
+  var query_string = {};
+  var query = window.location.search.substring(1);
+  var vars = query.split("&");
+  for (var i=0;i<vars.length;i++) {
+    var pair = vars[i].split("=");
+        // If first entry with this name
+    if (typeof query_string[pair[0]] === "undefined") {
+      query_string[pair[0]] = pair[1];
+        // If second entry with this name
+    } else if (typeof query_string[pair[0]] === "string") {
+      var arr = [ query_string[pair[0]], pair[1] ];
+      query_string[pair[0]] = arr;
+        // If third or later entry with this name
+    } else {
+      query_string[pair[0]].push(pair[1]);
+    }
+  } 
+    return query_string;
+} ();
+
+var product_id_notifier= QueryString.variant;
+var product_id_notifier = __st.rid;
+var replTexthome = "<a href='<%= appurl %>/public/<%= scriptname %>.html?product="+product_id_notifier+"'>Notify Me!</a>";
+var replTextproduct = "<a href='<%= appurl %>/public/<%= scriptname %>.html?product="+product_id_notifier+"'>Notify Me when Availible!</a>";
+
+var products = document.getElementsByClassName("purchase");
+for (i=0; i < products.length; i++) {
+  console.log(products[i]);
+  x =  products[i].innerHTML;
+  if (x.toLowerCase().indexOf("sold out") >= 0){
+  	products[i].innerHTML = replTextproduct;
+  }
+}
+
+var products = document.getElementsByClassName("price");
+
+for (i=0; i < products.length; i++) {
+  console.log(products[i]);
+  x =  products[i].innerHTML;
+  if (x.toLowerCase().indexOf("sold out") >= 0){
+  	f = x.toLowerCase().indexOf("sold out");
+  	var res = x.substr(0, f);
+  	products[i].innerHTML = res + replTextproduct;
+  }
+}
+
+var jq = jQuery.noConflict();
+console.log("Calling jquery");
+
+function drawElement(name){   
+  div = jq("<div />")
+  div.attr({id: "notifyMe", class: 'element'});
+  div.css({"display":"none","z-index": "10000", "position":"fixed", "background-image": "url('/clients/bg.png')","bottom": "0", "left": "0", "width": "100%", "height": "70px", "background-color":"#E0E0D1", "border-top": "5px solid #009966"});
+  div.html(name);
+  jq("body").append(div);
+  jq(div).show().animate({opacity:0.95, height: "+=20"},2500, function(){console.log("Animation done.")});
+  console.log("I was called. Element created.");
+}
+
+function expand(id){
+    jq( "#notifyMe" ).animate({
+    opacity: 0.95,
+    // height: "+=20",
+    // left: "0",
+    // height: "toggle"
+    }, 5000, function() {
+      // Animation complete.
+      // alert("Animation complete");
+    });
+
+    jq.colorbox({href:"http://localhost:5000/public/<%= scriptname %>.html?product="+QueryString.variant, 
+      iframe:false, 
+      width:'400px', 
+      height:'170px',
+      className: 'colorboxclass',
+      // onComplete : function(){
+      //   alert("Done loading");
+      // }
+    });
+
+}
+
+
+jq(document).ready(function(){
+	console.log("Jquery loaded");
+
+    console.log(__st.rid);
+
+		// v = jq( "link[itemprop='availability']" ).next("form").find("option[disabled]");
+
+		// c = jq( "link[itemprop='availability']" ).next("form").find(":contains('Sold Out')") //<--THIS WORKS!
+		// c.html('Yo Yo Yo');
+    c = jq( "link[itemprop='availability']" ).next("form").find(":contains('Sold Out'):not(:has(*))")
+		c.html(replTextproduct);
+    // console.log(c);
+    if (c.length){
+      pathArray = location.href.split( '/' );
+      protocol = pathArray[0];
+      host = pathArray[2];
+      url = protocol + '//' + host;
+      console.log(idofelement);
+      console.log("Yo Yo Yo type of ");
+      console.log(typeof idofelement);
+      if(typeof __st.rid !== "undefined"){
+          //document.getElementsByClassName("footer")[0].style.display = 'none';
+          console.log("SOLD OUT!")
+          var idofelement=QueryString.variant;
+          var idofelement = "undefined";
+           idofelement=__st.rid;
+          replacewith = "<%= appurl %>/public/<%= scriptname %>.html?product="+idofelement+"";
+          var str = "<%- clienthtml %>"
+          str = str.replace('{{product_url}}', replacewith);
+          // drawElement("<center><h2 style='position:relative; top:0.4em; color:white; font-weight: 900; line-height: 200%; text-shadow: 2px 2px 4px #000000;'>Notify me when this Product is availible <a href='<%= appurl %>/public/<%= scriptname %>.html?product="+QueryString.variant+"' onclick='' target='_blank' style='position:relative; top: -0.12em; border-radius:3px;-webkit-box-shadow:none;box-shadow:none;border:1px solid transparent;color:#fff;background-color:#384452;border-color:#384452;margin:4px;display:inline-block;padding:6px 12px;margin-bottom:0;font-size:14px;font-weight:normal;line-height:1.42857143;text-align:center;white-space:nowrap;vertical-align:middle;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background-image:none;border:1px solid transparent;border-radius:4px;border-radius: 3px;-webkit-box-shadow: none;box-shadow: none;border: 1px solid transparent;'>Notify Me</a></h2></center>");
+          drawElement(str);
+          
+      }else{
+          alert("ITs still defined boss");
+      }
+    }
+
+
+		d = jq( "div" ).find(":contains('Sold Out'):not(:has(*))");
+    if (d.length){
+      if(typeof __st.rid !== "undefined"){
+        console.log("SOLD OUT!!")
+        var idofelement=QueryString.variant;
+        //var idofelement = "undefined";
+        idofelement=__st.rid;
+        replacewith = "<%= appurl %>/public/<%= scriptname %>.html?product="+idofelement+"";
+        var str = "<%- clienthtml %>"
+        str = str.replace('{{product_url}}', replacewith);
+        // drawElement("<center><h2 style='position:relative; top:0.4em; color:white; font-weight: 900; line-height: 200%; text-shadow: 2px 2px 4px #000000;'>Notify me when this Product is availible <a href='<%= appurl %>/public/<%= scriptname %>.html?product="+QueryString.variant+"' onclick='' target='_blank' style='position:relative; top: -0.12em; border-radius:3px;-webkit-box-shadow:none;box-shadow:none;border:1px solid transparent;color:#fff;background-color:#384452;border-color:#384452;margin:4px;display:inline-block;padding:6px 12px;margin-bottom:0;font-size:14px;font-weight:normal;line-height:1.42857143;text-align:center;white-space:nowrap;vertical-align:middle;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background-image:none;border:1px solid transparent;border-radius:4px;border-radius: 3px;-webkit-box-shadow: none;box-shadow: none;border: 1px solid transparent;'>Notify Me</a></h2></center>");
+        drawElement(str);
+      }
+    }
+		d.remove();
+
+
+    
+
+
+
+})
+
+

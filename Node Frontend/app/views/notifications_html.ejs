@@ -1,0 +1,129 @@
+  <% include partials/header_panel %>
+<!-- <script type="text/javascript" src="/bower_components/angular-dynforms/dynamic-forms.js"></script> -->
+<!-- <script type="text/javascript" src="bower_components/angular/angular.min.js"></script> -->
+<script type="text/javascript" src="/bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+<script type="text/javascript" src="/bower_components/tv4/tv4.js"></script>
+<script type="text/javascript" src="/bower_components/objectpath/lib/ObjectPath.js"></script>
+<script type="text/javascript" src="/bower_components/angular-schema-form/dist/schema-form.js"></script>
+<script type="text/javascript" src="/bower_components/angular-schema-form/dist/bootstrap-decorator.min.js"></script>
+
+<script>
+var app = angular.module('root', ['schemaForm']);
+app.controller("index",function ($scope, $http) {
+$scope.message = "";
+
+$scope.loader = true;
+
+$scope.success = false;
+
+$scope.error = false;
+
+$scope.formData = {}; 
+
+
+$scope.schema = {};
+
+
+$scope.form = [
+"*",
+{
+type: "submit",
+title: "Send"
+}
+];
+
+$scope.model = {};
+
+var responsePromise = $http.get("/api/notifications");
+responsePromise.success(function(data, status, headers, config) {
+    $scope.schema = data.schema;
+    $scope.model = data.model;
+    $scope.message = "";
+    $scope.loader = false;
+});
+responsePromise.error(function(data, status, headers, config) {
+    alert("AJAX failed!");
+});
+
+
+$scope.onSubmit = function(form) {
+    // console.log(form);
+    // alert($scope.model.webhook_identifier)
+    $scope.message = "Saving...";
+    $scope.loader = true;
+    $scope.success = false;
+    $scope.error = false;
+    $http.post('/api/notifications', {data:$scope.model}).
+      success(function(data, status, headers, config) {
+        // this callback will be called asynchronously
+        // when the response is available
+        // alert('Yeaaah!'+data);
+        $scope.loader = false;
+        $scope.message = "Success: Notification sent succesfully. ";
+        $scope.success = true;
+      }).
+      error(function(data, status, headers, config) {
+        // called asynchronously if an error occurs
+        // or server returns response with an error status.
+        $scope.loader = false;
+        $scope.message = "Error: Unable to send Notification. ";
+        $scope.error = true;
+      });
+    
+}
+
+
+});
+</script>
+<% include partials/nav %>
+<br>
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Dashboard
+      <small>for <%= shop %></small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Send Notifications</li>
+    </ol>
+  </section>
+  <!-- Main content -->
+  <section class="content">
+
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Send Notifications</h3>
+        <div class="box-tools pull-right">
+          <!-- Buttons, labels, and many other things can be placed here! -->
+          <!-- Here is a label for example -->
+          <span class="label label-primary"></span>
+        </div><!-- /.box-tools -->
+      </div><!-- /.box-header -->
+      <div class="box-body">
+        <div class="" ng-app="root">
+    <div class="" ng-controller="index">
+         <!-- <p ng-controller="index"> -->
+          <div ng-controller="index">
+           <form sf-schema="schema" sf-form="form" sf-model="model" ng-submit="onSubmit(myForm)"></form>
+          <!-- <form sf-schema="schema" sf-form="form" sf-model="model"></form> -->
+
+            <center><img ng-show="loader" class="ng-hide" src='/images/ajax-loader.gif'/></center>
+
+            <div class="alert alert-success" ng-show="success" class="ng-hide" role="alert">{{message}}</div>
+            <div class="alert alert-danger" ng-show="error" class="ng-hide" role="alert">{{message}}</div>
+          </div>
+          </p>
+    </div>
+  </div>
+      </div><!-- /.box-body -->
+      <div class="box-footer">
+        Notifications are sent to everyone who's subscribed to your <a href="http://www.pushbullet.com">Pushbullet</a> Channel.
+      </div><!-- box-footer -->
+  </div><!-- /.box -->
+    
+  </section>
+  <!-- /Main content -->
+</div>
+<% include partials/footer_panel %>
